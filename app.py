@@ -100,20 +100,28 @@ def show_venue(venue_id):
   #get venue by id
   venue = Venue.query.get(venue_id)
   #define upcoming and past shows
+  upcoming_shows_query = db.session.query(Show).join(Venue).filter(Show.venue_id==venue_id).filter(Show.start_time>datetime.now()).all()
   upcoming_shows= []
+  
+  past_shows_query = db.session.query(Show).join(Venue).filter(Show.venue_id==venue_id).filter(Show.start_time<datetime.now()).all()
   past_shows= []
   
-  for show in venue.shows:
-    show_data = {
+  for show in upcoming_shows_query:
+    upcoming_shows.append({
       'artist_image_link': show.artist.image_link,
       'artist_id': show.artist.id,
       'artist_name': show.artist.name,
       'start_time': show.start_time.strftime('%Y-%m-%d %H:%M:%S')
-    }
-    if show.start_time <= datetime.now():
-      past_shows.append(show_data)
-    else:
-        upcoming_shows.append(show_data)
+    })
+
+  for show in past_shows_query:
+   past_shows.append({
+    'artist_image_link': show.artist.image_link,
+    'artist_id': show.artist.id,
+    'artist_name': show.artist.name,
+    'start_time': show.start_time.strftime('%Y-%m-%d %H:%M:%S')
+  })
+
   
   #display appropriate data
   data= {
@@ -230,20 +238,28 @@ def show_artist(artist_id):
   #get artist by id
   artist= Artist.query.get(artist_id)
   #define upcoming and past shows
+  upcoming_shows_query = db.session.query(Show).join(Venue).filter(Show.artist_id==artist_id).filter(Show.start_time>datetime.now()).all()
   upcoming_shows= []
+  
+  past_shows_query = db.session.query(Show).join(Venue).filter(Show.artist_id==artist_id).filter(Show.start_time<datetime.now()).all()
   past_shows= []
 
-  for show in artist.shows:
-    show_data = {
+  for show in upcoming_shows_query:
+    upcoming_shows.append({
       'venue_image_link': show.venue.image_link,
-      'venue_id': show.venue.id,
+      'venue_id': show.venue_id,
       'venue_name': show.venue.name,
       'start_time': show.start_time.strftime('%Y-%m-%d %H:%M:%S')
-    }
-    if show.start_time <= datetime.now():
-      past_shows.append(show_data)
-    else:
-        upcoming_shows.append(show_data)
+    })
+
+  for show in past_shows_query:
+     past_shows.append({
+      'venue_image_link': show.venue.image_link,
+      'venue_id': show.venue_id,
+      'venue_name': show.venue.name,
+      'start_time': show.start_time.strftime('%Y-%m-%d %H:%M:%S')
+    })
+
 
   #display appropriate data 
   data= {
